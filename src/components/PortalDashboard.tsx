@@ -53,8 +53,8 @@ export default function PortalDashboard({ userName, accountNumber }: Props) {
       {/* Top header */}
       <div className="bg-green-800 text-white px-4 py-3 flex items-center gap-3">
         <Image
-          src="/logo.png"
-          alt="FinaCOOP"
+          src="/fh95-logo.svg"
+          alt="FH'95"
           width={64}
           height={36}
           className="object-contain flex-shrink-0"
@@ -64,7 +64,6 @@ export default function PortalDashboard({ userName, accountNumber }: Props) {
           <p className="text-xs text-green-200 leading-tight truncate">
             FH&apos;95 Cooperative Multipurpose Society Ltd
           </p>
-          <p className="text-xs text-green-300 leading-tight">Powered by FinaCOOP</p>
         </div>
       </div>
 

@@ -31,7 +31,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
           <div className="flex justify-center pt-8 pb-2 px-8">
-            <Image src="/logo.png" alt="FinaCOOP" width={180} height={90} className="object-contain" />
+            <Image src="/fh95-logo.svg" alt="FH'95" width={180} height={72} className="object-contain" />
           </div>
           <div className="px-8 pb-8 pt-4">
             <form onSubmit={(e) => { e.preventDefault(); void handleLogin(); }} className="space-y-4">
@@ -78,7 +78,7 @@ export default function LoginPage() {
         </div>
       </div>
       <p className="text-black text-xs mt-5 text-center">
-        {`© ${new Date().getFullYear()} FH'95 Cooperative Multipurpose Society Ltd. Powered by FinaCOOP.`}
+        {`© ${new Date().getFullYear()}  FH'95 Cooperative Multipurpose Society Ltd. Powered by FinaCOOP.`}
       </p>
     </>
   );

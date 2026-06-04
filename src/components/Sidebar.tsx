@@ -57,7 +57,7 @@ export default function Sidebar({ userRole, userEmail, userName, mobileOpen, onM
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="px-6 py-5 border-b border-gray-700">
-        <Image src="/logo.png" alt="FinaCOOP" width={148} height={44} className="object-contain" />
+        <Image src="/fh95-logo.svg" alt="FH'95" width={150} height={48} className="object-contain" />
       </div>
 
       {/* Nav */}
@@ -71,7 +71,7 @@ export default function Sidebar({ userRole, userEmail, userName, mobileOpen, onM
               onClick={onMobileClose}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium ${
                 active
-                  ? "bg-indigo-600 text-white"
+                  ? "bg-gray-600 text-white"
                   : "text-gray-400 hover:bg-gray-700 hover:text-white"
               }`}
             >

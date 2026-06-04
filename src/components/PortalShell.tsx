@@ -59,9 +59,9 @@ export default function PortalShell({ children, userName, accountNumber, role }:
       <div className="px-4 pt-5 pb-4 border-b border-gray-700 flex-shrink-0">
         <Link href="/dashboard" onClick={() => setOpen(false)}>
           <Image
-            src="/logo.png"
-            alt="FinaCOOP"
-            width={130}
+            src="/fh95-logo.svg"
+            alt="FH'95"
+            width={150}
             height={52}
             className="object-contain"
           />
@@ -161,7 +161,7 @@ export default function PortalShell({ children, userName, accountNumber, role }:
                 d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <Image src="/logo.png" alt="FinaCOOP" width={80} height={30} className="object-contain" />
+          <Image src="/fh95-logo.svg" alt="FH'95" width={80} height={30} className="object-contain" />
           <span className="text-sm font-semibold truncate ml-1">{userName}</span>
         </header>
 

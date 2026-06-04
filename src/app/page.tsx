@@ -55,10 +55,10 @@ export default function LandingPage() {
         {/* Logo */}
         <div className="flex justify-center pt-8 pb-3 px-8">
           <Image
-            src="/logo.png"
-            alt="FinaCOOP"
+            src="/fh95-logo.svg"
+            alt="FH'95"
             width={180}
-            height={90}
+            height={72}
             className="object-contain"
             priority
           />
@@ -66,9 +66,6 @@ export default function LandingPage() {
 
         {/* Branding text */}
         <div className="text-center px-8 pb-5 space-y-1">
-          <p className="text-purple-700 font-semibold text-sm tracking-wide">
-            FinaCOOP Professional 2.12i
-          </p>
           <p className="text-green-800 font-bold text-sm leading-snug">
             FH&apos;95 Cooperative Multipurpose Society Ltd
           </p>

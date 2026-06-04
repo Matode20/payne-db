@@ -40,7 +40,7 @@ export default function SignupPage() {
         <div className="w-full max-w-sm">
           <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
             <div className="flex justify-center pt-8 pb-2 px-8">
-              <Image src="/logo.png" alt="FinaCOOP" width={180} height={90} className="object-contain" />
+              <Image src="/fh95-logo.svg" alt="FH'95" width={180} height={72} className="object-contain" />
             </div>
             <div className="px-8 pb-8 pt-4 text-center">
               <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -67,7 +67,7 @@ export default function SignupPage() {
       <div className="w-full max-w-sm">
         <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
           <div className="flex justify-center pt-8 pb-2 px-8">
-            <Image src="/logo.png" alt="FinaCOOP" width={180} height={90} className="object-contain" />
+            <Image src="/fh95-logo.svg" alt="FH'95" width={180} height={72} className="object-contain" />
           </div>
           <div className="px-8 pb-8 pt-4">
             <form onSubmit={(e) => { e.preventDefault(); void handleSignup(); }} className="space-y-4">
