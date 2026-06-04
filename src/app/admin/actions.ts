@@ -165,6 +165,75 @@ export async function setBanStatus(memberId: string, banned: boolean) {
   return { success: true };
 }
 
+// ── User management (used by UsersTable) ──────────────────
+
+export async function banUser(userId: string) {
+  await requireAdmin();
+  const admin = createAdminClient();
+  const { error } = await admin.auth.admin.updateUserById(userId, {
+    ban_duration: "876600h",
+  });
+  if (error) throw new Error(error.message);
+  await admin.from("profiles").update({ status: "banned" }).eq("id", userId);
+  revalidatePath("/admin/users");
+}
+
+export async function unbanUser(userId: string) {
+  await requireAdmin();
+  const admin = createAdminClient();
+  const { error } = await admin.auth.admin.updateUserById(userId, {
+    ban_duration: "none",
+  });
+  if (error) throw new Error(error.message);
+  await admin.from("profiles").update({ status: "active" }).eq("id", userId);
+  revalidatePath("/admin/users");
+}
+
+export async function updateUserRole(userId: string, role: string) {
+  await requireAdmin();
+  const admin = createAdminClient();
+  const { error } = await admin.from("profiles").update({ role }).eq("id", userId);
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/users");
+}
+
+export async function listUsers(query?: string) {
+  await requireAdmin();
+  const admin = createAdminClient();
+
+  const { data: { users: authUsers }, error } = await admin.auth.admin.listUsers({ perPage: 1000 });
+  if (error) throw new Error(error.message);
+
+  const { data: profiles } = await admin.from("profiles").select("id, full_name, role");
+  const profileMap = new Map((profiles ?? []).map((p: { id: string; full_name: string; role: string }) => [p.id, p]));
+
+  let result = authUsers.map((u) => {
+    const profile = profileMap.get(u.id) as { full_name: string; role: string } | undefined;
+    return {
+      id: u.id,
+      email: u.email ?? "",
+      full_name: profile?.full_name ?? (u.user_metadata?.full_name as string) ?? "",
+      role: profile?.role ?? (u.user_metadata?.role as string) ?? "member",
+      created_at: u.created_at,
+      last_sign_in_at: u.last_sign_in_at ?? null,
+      email_confirmed_at: u.email_confirmed_at ?? null,
+      banned_until: u.banned_until ?? null,
+    };
+  });
+
+  if (query) {
+    const q = query.toLowerCase();
+    result = result.filter(
+      (u) =>
+        u.email.toLowerCase().includes(q) ||
+        u.full_name.toLowerCase().includes(q) ||
+        u.id.toLowerCase().includes(q)
+    );
+  }
+
+  return result;
+}
+
 export async function generateAccountNumber() {
   await requireAdmin();
   const admin = createAdminClient();

@@ -27,7 +27,7 @@ export default async function ReportsPage() {
     for (const f of balanceFields) { totals[f.key] = 0; }
     for (const row of (data ?? [])) {
       for (const f of balanceFields) {
-        totals[f.key] += Number((row as Record<string, unknown>)[f.key] ?? 0);
+        totals[f.key] += Number((row as unknown as Record<string, unknown>)[f.key] ?? 0);
       }
     }
   } catch { /* not yet migrated */ }

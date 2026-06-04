@@ -27,7 +27,7 @@ export default async function TransactionsPage({
       .limit(200);
 
     const { data } = await query;
-    rows = (data ?? []) as typeof rows;
+    rows = (data ?? []) as unknown as typeof rows;
 
     if (q) {
       const qLower = q.toLowerCase();

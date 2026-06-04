@@ -40,7 +40,7 @@ export default async function ModulePage({ params }: { params: Promise<{ module:
       displayName   = profile.full_name   || displayName;
       accountNumber = profile.account_number || accountNumber;
     }
-    if (b) balance = Number((b as Record<string, unknown>)[config.balanceKey] ?? 0);
+    if (b) balance = Number((b as unknown as Record<string, unknown>)[config.balanceKey] ?? 0);
   } catch { /* table not yet created */ }
 
   const today = new Date().toISOString().split("T")[0];

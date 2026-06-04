@@ -42,7 +42,7 @@ export default async function EditMemberPage({
     ]);
 
     if (!p) notFound();
-    profile      = p as typeof profile;
+    profile      = p;
     if (b) balances     = b as unknown as BalancesData;
     transactions = (tx ?? []) as typeof transactions;
   } catch {
