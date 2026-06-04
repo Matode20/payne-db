@@ -43,7 +43,7 @@ export default function LoginPage() {
               )}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Username
+                  Email Address
                 </label>
                 <input
                   type="email"
@@ -79,7 +79,7 @@ export default function LoginPage() {
         </div>
       </div>
       <p className="text-white text-xs mt-5 text-center" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}>
-        © {new Date().getFullYear()} Seeds Cooperative Multipurpose Society Ltd. Powered by FinaCOOP.
+        © {new Date().getFullYear()} FH&apos;95 Cooperative Multipurpose Society Ltd. Powered by FinaCOOP.
       </p>
     </>
   );

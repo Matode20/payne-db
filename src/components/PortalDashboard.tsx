@@ -62,7 +62,7 @@ export default function PortalDashboard({ userName, accountNumber }: Props) {
         <div className="min-w-0">
           <p className="font-bold text-sm leading-tight">PayneDB</p>
           <p className="text-xs text-green-200 leading-tight truncate">
-            Seeds Cooperative Multipurpose Society Ltd
+            FH&apos;95 Cooperative Multipurpose Society Ltd
           </p>
           <p className="text-xs text-green-300 leading-tight">Powered by FinaCOOP</p>
         </div>

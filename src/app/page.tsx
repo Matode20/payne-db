@@ -70,7 +70,7 @@ export default function LandingPage() {
             FinaCOOP Professional 2.12i
           </p>
           <p className="text-green-800 font-bold text-sm leading-snug">
-            Seeds Cooperative Multipurpose Society Ltd
+            FH&apos;95 Cooperative Multipurpose Society Ltd
           </p>
         </div>
 
