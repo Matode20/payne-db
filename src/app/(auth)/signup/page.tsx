@@ -15,8 +15,7 @@ export default function SignupPage() {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  async function handleSignup(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleSignup() {
     setError(null);
     setLoading(true);
     const supabase = createClient();
@@ -56,8 +55,8 @@ export default function SignupPage() {
             </div>
           </div>
         </div>
-        <p className="text-white text-xs mt-5 text-center" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}>
-          © {new Date().getFullYear()} FH&apos;95 Cooperative Multipurpose Society Ltd. Powered by FinaCOOP.
+        <p className="text-black text-xs mt-5 text-center">
+          {`© ${new Date().getFullYear()} FH'95 Cooperative Multipurpose Society Ltd. Powered by FinaCOOP.`}
         </p>
       </>
     );
@@ -71,7 +70,7 @@ export default function SignupPage() {
             <Image src="/logo.png" alt="FinaCOOP" width={180} height={90} className="object-contain" />
           </div>
           <div className="px-8 pb-8 pt-4">
-            <form onSubmit={handleSignup} className="space-y-4">
+            <form onSubmit={(e) => { e.preventDefault(); void handleSignup(); }} className="space-y-4">
               {error && (
                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
                   {error}
@@ -134,8 +133,8 @@ export default function SignupPage() {
           </div>
         </div>
       </div>
-      <p className="text-white text-xs mt-5 text-center" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}>
-        © {new Date().getFullYear()} FH&apos;95 Cooperative Multipurpose Society Ltd. Powered by FinaCOOP.
+      <p className="text-black text-xs mt-5 text-center">
+        {`© ${new Date().getFullYear()} FH'95 Cooperative Multipurpose Society Ltd. Powered by FinaCOOP.`}
       </p>
     </>
   );

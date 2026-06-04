@@ -12,8 +12,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleLogin() {
     setError(null);
     setLoading(true);
     const supabase = createClient();
@@ -35,7 +34,7 @@ export default function LoginPage() {
             <Image src="/logo.png" alt="FinaCOOP" width={180} height={90} className="object-contain" />
           </div>
           <div className="px-8 pb-8 pt-4">
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={(e) => { e.preventDefault(); void handleLogin(); }} className="space-y-4">
               {error && (
                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
                   {error}
@@ -78,8 +77,8 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-      <p className="text-white text-xs mt-5 text-center" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}>
-        © {new Date().getFullYear()} FH&apos;95 Cooperative Multipurpose Society Ltd. Powered by FinaCOOP.
+      <p className="text-black text-xs mt-5 text-center">
+        {`© ${new Date().getFullYear()} FH'95 Cooperative Multipurpose Society Ltd. Powered by FinaCOOP.`}
       </p>
     </>
   );
