@@ -128,9 +128,6 @@ export default function LandingPage() {
               Create one here
             </a>
           </p>
-          <p className="text-xs font-medium" style={{ color: "#c0392b" }}>
-            &copy; copyright, OmegaPlus Solutions Ltd, 2010-2026
-          </p>
         </div>
       </div>
     </div>

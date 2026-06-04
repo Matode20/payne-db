@@ -56,7 +56,7 @@ export default function SignupPage() {
           </div>
         </div>
         <p className="text-black text-xs mt-5 text-center">
-          {`© ${new Date().getFullYear()} FH'95 Cooperative Multipurpose Society Ltd. Powered by FinaCOOP.`}
+          {`© ${new Date().getFullYear()} FH'95 Cooperative Multipurpose Society Ltd.`}
         </p>
       </>
     );
@@ -134,7 +134,7 @@ export default function SignupPage() {
         </div>
       </div>
       <p className="text-black text-xs mt-5 text-center">
-        {`© ${new Date().getFullYear()} FH'95 Cooperative Multipurpose Society Ltd. Powered by FinaCOOP.`}
+        {`© ${new Date().getFullYear()} FH'95 Cooperative Multipurpose Society Ltd.`}
       </p>
     </>
   );
