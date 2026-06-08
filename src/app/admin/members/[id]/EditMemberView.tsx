@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   updateMemberProfile,
   updateMemberBalances,
@@ -61,6 +62,8 @@ function fmt(n: number) {
 }
 
 export default function EditMemberView({ profile, balances, transactions }: Props) {
+  const router = useRouter();
+
   // Profile form state
   const [prof, setProf]       = useState({ ...profile });
   const [profSaving, setProfSaving] = useState(false);
@@ -86,6 +89,7 @@ export default function EditMemberView({ profile, balances, transactions }: Prop
       role: prof.role,
       status: prof.status,
     });
+    if (!result.error) router.refresh();
     setProfMsg(result.error ? { ok: false, text: result.error } : { ok: true, text: "Profile saved." });
     setProfSaving(false);
   }
@@ -93,8 +97,8 @@ export default function EditMemberView({ profile, balances, transactions }: Prop
   async function saveBalances() {
     setBalSaving(true); setBalMsg(null);
     const result = await updateMemberBalances(profile.id, bals, desc);
+    if (!result.error) { setDesc(""); router.refresh(); }
     setBalMsg(result.error ? { ok: false, text: result.error } : { ok: true, text: "Balances saved and transaction logged." });
-    if (!result.error) setDesc("");
     setBalSaving(false);
   }
 
@@ -130,8 +134,8 @@ export default function EditMemberView({ profile, balances, transactions }: Prop
           </svg>
         </Link>
         <div>
-          <h1 className="text-xl font-bold text-gray-900">{profile.full_name || profile.email}</h1>
-          <p className="text-xs text-gray-500 font-mono">{profile.account_number}</p>
+          <h1 className="text-xl font-bold text-gray-900">{prof.full_name || profile.email}</h1>
+          <p className="text-xs text-gray-500 font-mono">{prof.account_number}</p>
         </div>
       </div>
 
