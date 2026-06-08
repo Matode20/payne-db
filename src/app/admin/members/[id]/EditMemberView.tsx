@@ -81,24 +81,45 @@ export default function EditMemberView({ profile, balances, transactions }: Prop
 
   async function saveProfile() {
     setProfSaving(true); setProfMsg(null);
-    const result = await updateMemberProfile(profile.id, {
-      account_number: prof.account_number,
-      full_name: prof.full_name,
-      phone: prof.phone,
-      address: prof.address,
-      role: prof.role,
-      status: prof.status,
-    });
-    if (!result.error) router.refresh();
-    setProfMsg(result.error ? { ok: false, text: result.error } : { ok: true, text: "Profile saved." });
+    try {
+      const result = await updateMemberProfile(profile.id, {
+        account_number: prof.account_number,
+        full_name:      prof.full_name,
+        phone:          prof.phone,
+        address:        prof.address,
+        role:           prof.role,
+        status:         prof.status,
+      });
+      console.log("[saveProfile] result:", result);
+      if (result.error) {
+        setProfMsg({ ok: false, text: result.error });
+      } else {
+        setProfMsg({ ok: true, text: "Profile saved." });
+        router.refresh();
+      }
+    } catch (e) {
+      console.error("[saveProfile] threw:", e);
+      setProfMsg({ ok: false, text: e instanceof Error ? e.message : "Save failed." });
+    }
     setProfSaving(false);
   }
 
   async function saveBalances() {
     setBalSaving(true); setBalMsg(null);
-    const result = await updateMemberBalances(profile.id, bals, desc);
-    if (!result.error) { setDesc(""); router.refresh(); }
-    setBalMsg(result.error ? { ok: false, text: result.error } : { ok: true, text: "Balances saved and transaction logged." });
+    try {
+      const result = await updateMemberBalances(profile.id, bals, desc);
+      console.log("[saveBalances] result:", result);
+      if (result.error) {
+        setBalMsg({ ok: false, text: result.error });
+      } else {
+        setBalMsg({ ok: true, text: "Balances saved and transaction logged." });
+        setDesc("");
+        router.refresh();
+      }
+    } catch (e) {
+      console.error("[saveBalances] threw:", e);
+      setBalMsg({ ok: false, text: e instanceof Error ? e.message : "Save failed." });
+    }
     setBalSaving(false);
   }
 

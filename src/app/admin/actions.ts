@@ -61,19 +61,35 @@ export async function createMember(formData: FormData) {
 
 export async function updateMemberProfile(
   memberId: string,
-  data: Partial<{
+  data: {
     account_number: string;
     full_name: string;
     phone: string;
     address: string;
     role: string;
     status: string;
-  }>
+  }
 ) {
   await requireAdmin();
   const admin = createAdminClient();
-  const { error } = await admin.from("profiles").update(data).eq("id", memberId);
-  if (error) return { error: error.message };
+  console.log("[updateMemberProfile] updating member:", memberId, data);
+  const { error, data: updated } = await admin
+    .from("profiles")
+    .update({
+      full_name:      data.full_name,
+      account_number: data.account_number,
+      phone:          data.phone,
+      address:        data.address,
+      role:           data.role,
+      status:         data.status,
+    })
+    .eq("id", memberId)
+    .select();
+  if (error) {
+    console.error("[updateMemberProfile] error:", error);
+    return { error: error.message };
+  }
+  console.log("[updateMemberProfile] updated rows:", updated);
   revalidatePath(`/admin/members/${memberId}`);
   revalidatePath("/admin/members");
   return { success: true };
@@ -101,36 +117,61 @@ export async function updateMemberBalances(
   const callerUser = await requireAdmin();
   const admin = createAdminClient();
 
+  console.log("[updateMemberBalances] updating balances for member:", memberId, newBalances);
+
   const { data: current } = await admin
     .from("balances")
     .select("*")
     .eq("member_id", memberId)
     .single();
 
-  const { error: balErr } = await admin.from("balances").upsert({
-    member_id: memberId,
-    ...newBalances,
-    updated_at: new Date().toISOString(),
-  });
-  if (balErr) return { error: balErr.message };
+  const { error: balErr, data: upserted } = await admin
+    .from("balances")
+    .upsert(
+      {
+        member_id:        memberId,
+        savings:          newBalances.savings,
+        share_capital:    newBalances.share_capital,
+        special_savings:  newBalances.special_savings,
+        spf_investment:   newBalances.spf_investment,
+        mutual_investment:newBalances.mutual_investment,
+        club50_investment:newBalances.club50_investment,
+        shirmawa:         newBalances.shirmawa,
+        members_loan:     newBalances.members_loan,
+        spf_loan:         newBalances.spf_loan,
+        product_loan:     newBalances.product_loan,
+        lords_investment: newBalances.lords_investment,
+        updated_at:       new Date().toISOString(),
+      },
+      { onConflict: "member_id" }
+    )
+    .select();
+
+  if (balErr) {
+    console.error("[updateMemberBalances] upsert error:", balErr);
+    return { error: balErr.message };
+  }
+  console.log("[updateMemberBalances] upserted rows:", upserted);
 
   // Log a transaction row for every changed field
   const txRows = (Object.keys(newBalances) as (keyof BalancesData)[])
     .filter((f) => Number(current?.[f] ?? 0) !== Number(newBalances[f]))
     .map((f) => ({
-      member_id: memberId,
-      field: f,
-      description: description || `${f.replace(/_/g, " ")} updated`,
-      balance_before: Number(current?.[f] ?? 0),
-      balance_after: Number(newBalances[f]),
+      member_id:        memberId,
+      field:            f,
+      description:      description || `${f.replace(/_/g, " ")} updated`,
+      balance_before:   Number(current?.[f] ?? 0),
+      balance_after:    Number(newBalances[f]),
       created_by_admin: callerUser.id,
     }));
 
   if (txRows.length > 0) {
-    await admin.from("transactions").insert(txRows);
+    const { error: txErr } = await admin.from("transactions").insert(txRows);
+    if (txErr) console.error("[updateMemberBalances] transaction log error:", txErr);
   }
 
   revalidatePath(`/admin/members/${memberId}`);
+  revalidatePath("/admin/members");
   revalidatePath("/admin");
   return { success: true };
 }
