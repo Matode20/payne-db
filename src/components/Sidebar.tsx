@@ -56,7 +56,7 @@ export default function Sidebar({ userRole, userEmail, userName, mobileOpen, onM
   const sidebarContent = (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="px-6 py-5 border-b border-gray-700">
+      <div className="px-6 py-5 border-b border-gray-500">
         <Image src="/fh95-logo.svg" alt="FH'95" width={150} height={48} className="object-contain" />
       </div>
 
@@ -71,8 +71,8 @@ export default function Sidebar({ userRole, userEmail, userName, mobileOpen, onM
               onClick={onMobileClose}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium ${
                 active
-                  ? "bg-gray-600 text-white"
-                  : "text-gray-400 hover:bg-gray-700 hover:text-white"
+                  ? "bg-gray-800 text-white"
+                  : "text-gray-200 hover:bg-gray-500 hover:text-white"
               }`}
             >
               {item.icon}
@@ -83,17 +83,17 @@ export default function Sidebar({ userRole, userEmail, userName, mobileOpen, onM
       </nav>
 
       {/* User info + sign out */}
-      <div className="px-3 py-4 border-t border-gray-700">
+      <div className="px-3 py-4 border-t border-gray-500">
         <div className="px-3 py-2 mb-2">
           <p className="text-white text-sm font-medium truncate">{userName || "User"}</p>
-          <p className="text-gray-400 text-xs truncate">{userEmail}</p>
+          <p className="text-gray-200 text-xs truncate">{userEmail}</p>
           {userRole && (
             <span className={`inline-block mt-1 text-xs px-2 py-0.5 rounded-full font-medium ${
               userRole === "admin"
                 ? "bg-indigo-500/20 text-indigo-300"
                 : userRole === "banned"
                 ? "bg-red-500/20 text-red-300"
-                : "bg-gray-600 text-gray-300"
+                : "bg-gray-500 text-gray-200"
             }`}>
               {userRole}
             </span>
@@ -102,7 +102,7 @@ export default function Sidebar({ userRole, userEmail, userName, mobileOpen, onM
         <button
           onClick={handleSignOut}
           disabled={signingOut}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition-colors text-sm font-medium disabled:opacity-60"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-200 hover:bg-gray-500 hover:text-white transition-colors text-sm font-medium disabled:opacity-60"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -116,7 +116,7 @@ export default function Sidebar({ userRole, userEmail, userName, mobileOpen, onM
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex flex-col w-64 bg-gray-900 h-screen sticky top-0">
+      <aside className="hidden lg:flex flex-col w-64 bg-gray-600 h-screen sticky top-0">
         {sidebarContent}
       </aside>
 
@@ -127,7 +127,7 @@ export default function Sidebar({ userRole, userEmail, userName, mobileOpen, onM
             className="absolute inset-0 bg-black/60"
             onClick={onMobileClose}
           />
-          <aside className="relative z-50 flex flex-col w-64 bg-gray-900 h-full">
+          <aside className="relative z-50 flex flex-col w-64 bg-gray-600 h-full">
             {sidebarContent}
           </aside>
         </div>
