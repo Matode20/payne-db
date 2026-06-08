@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 
 const modules: Record<string, { label: string; balanceKey: string }> = {
   "spf-investment":    { label: "SPF Investment",           balanceKey: "spf_investment"    },
-  "shirmawa":          { label: "Shirmawa",                 balanceKey: "shirmawa"          },
+  "estate-investment": { label: "Estate Investment",         balanceKey: "shirmawa"          },
   "ledger":            { label: "Ledger",                   balanceKey: "savings"           },
   "mutual-investment": { label: "Mutual Investment",        balanceKey: "mutual_investment" },
   "loan":              { label: "Loan",                     balanceKey: "members_loan"      },

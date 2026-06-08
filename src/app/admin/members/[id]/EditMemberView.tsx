@@ -49,7 +49,7 @@ const balanceFields: { key: keyof BalancesData; label: string }[] = [
   { key: "spf_investment",    label: "SPF Investment"             },
   { key: "mutual_investment", label: "FH'95 Mutual Investment"    },
   { key: "club50_investment", label: "FH'95 Club 50 Investment"   },
-  { key: "shirmawa",          label: "Shirmawa"                   },
+  { key: "shirmawa",          label: "Estate Investment"          },
   { key: "members_loan",      label: "Members Loan"               },
   { key: "spf_loan",          label: "SPF Loan"                   },
   { key: "product_loan",      label: "Product Loan"               },

@@ -6,7 +6,7 @@ import { logout } from "@/app/actions";
 const menuItems = [
   { label: "Summary",          href: "/dashboard/summary" },
   { label: "SPF Investment",   href: "/dashboard/spf-investment" },
-  { label: "Shirmawa",         href: "/dashboard/shirmawa" },
+  { label: "Estate Investment", href: "/dashboard/estate-investment" },
   { label: "Ledger",           href: "/dashboard/ledger" },
   { label: "Mutual Investment",href: "/dashboard/mutual-investment" },
   { label: "Loan",             href: "/dashboard/loan" },
