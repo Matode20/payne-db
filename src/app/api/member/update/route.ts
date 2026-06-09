@@ -1,4 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/admin';
+import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -73,6 +74,13 @@ export async function POST(request: Request) {
     .select('full_name, account_number, phone, address, role, status')
     .eq('id', memberId)
     .single();
+
+  // Bust Next.js server cache so dashboard pages serve fresh data immediately
+  revalidatePath('/dashboard', 'layout');
+  revalidatePath('/dashboard');
+  revalidatePath('/dashboard/summary');
+  revalidatePath('/dashboard/[module]', 'page');
+  revalidatePath('/admin/members', 'layout');
 
   return NextResponse.json({ success: true, saved: verify ?? null });
 }
