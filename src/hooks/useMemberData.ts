@@ -1,60 +1,84 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyData = Record<string, any>;
+
 export function useMemberData() {
   const [userId,   setUserId]   = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [profile,  setProfile]  = useState<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [balances, setBalances] = useState<any>(null);
+  const [profile,  setProfile]  = useState<AnyData | null>(null);
+  const [balances, setBalances] = useState<AnyData | null>(null);
   const [loading,  setLoading]  = useState(true);
 
-  useEffect(() => {
-    const supabase = createClient();
+  // Always fetches from the server API route which uses the service role client —
+  // same client that writes data, same Supabase project, bypasses RLS and any
+  // browser-side session/key mismatch.
+  const fetchFresh = useCallback(async () => {
+    try {
+      const res = await fetch('/api/member/data', {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' },
+      });
+      if (res.status === 401) return null;
+      const json = await res.json();
+      if (json.error) return null;
+      return json as { userId: string; profile: AnyData; balances: AnyData };
+    } catch {
+      return null;
+    }
+  }, []);
 
-    // Track channel reference so cleanup always has access to it
-    // even if it was created after the effect cleanup fires.
-    let channelRef: ReturnType<typeof supabase.channel> | null = null;
-    let active = true; // guard against setState after unmount
+  useEffect(() => {
+    let active = true;
+    let channelRef: ReturnType<ReturnType<typeof createClient>['channel']> | null = null;
 
     async function init() {
-      const { data: { user } } = await supabase.auth.getUser();
+      // Initial load via server API (service role)
+      const data = await fetchFresh();
       if (!active) return;
-      if (!user) { setLoading(false); return; }
 
-      setUserId(user.id);
+      if (!data) {
+        setLoading(false);
+        return;
+      }
 
-      // Initial data load
-      const [{ data: profileData }, { data: balanceData }] = await Promise.all([
-        supabase.from('profiles').select('*').eq('id', user.id).single(),
-        supabase.from('balances').select('*').eq('member_id', user.id).single(),
-      ]);
-
-      if (!active) return;
-      setProfile(profileData);
-      setBalances(balanceData);
+      setUserId(data.userId);
+      setProfile(data.profile);
+      setBalances(data.balances);
       setLoading(false);
 
-      // Realtime subscription — fires instantly when admin updates DB
+      // Layer realtime on top — if enabled in Supabase, updates arrive instantly;
+      // if not enabled, the initial fetch already shows the latest data.
+      const supabase = createClient();
       channelRef = supabase
-        .channel(`member-data-${user.id}`)
+        .channel(`member-data-${data.userId}`)
         .on('postgres_changes', {
           event: '*',
           schema: 'public',
           table: 'balances',
-          filter: `member_id=eq.${user.id}`,
-        }, (payload) => {
-          if (active) setBalances(payload.new);
+          filter: `member_id=eq.${data.userId}`,
+        }, () => {
+          // Re-fetch via server API so we always use the service role client
+          fetchFresh().then((fresh) => {
+            if (active && fresh) {
+              setProfile(fresh.profile);
+              setBalances(fresh.balances);
+            }
+          });
         })
         .on('postgres_changes', {
           event: '*',
           schema: 'public',
           table: 'profiles',
-          filter: `id=eq.${user.id}`,
-        }, (payload) => {
-          if (active) setProfile(payload.new);
+          filter: `id=eq.${data.userId}`,
+        }, () => {
+          fetchFresh().then((fresh) => {
+            if (active && fresh) {
+              setProfile(fresh.profile);
+              setBalances(fresh.balances);
+            }
+          });
         })
         .subscribe();
     }
@@ -63,9 +87,11 @@ export function useMemberData() {
 
     return () => {
       active = false;
-      if (channelRef) supabase.removeChannel(channelRef);
+      if (channelRef) {
+        createClient().removeChannel(channelRef);
+      }
     };
-  }, []);
+  }, [fetchFresh]);
 
-  return { userId, profile, balances, loading };
+  return { userId, profile, balances, loading, refetch: fetchFresh };
 }
