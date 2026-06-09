@@ -1,23 +1,22 @@
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+"use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { logout } from "@/app/actions";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 const menuItems = [
-  { label: "Summary",          href: "/dashboard/summary" },
-  { label: "SPF Investment",   href: "/dashboard/spf-investment" },
+  { label: "Summary",           href: "/dashboard/summary" },
+  { label: "SPF Investment",    href: "/dashboard/spf-investment" },
   { label: "Estate Investment", href: "/dashboard/estate-investment" },
-  { label: "Ledger",           href: "/dashboard/ledger" },
-  { label: "Mutual Investment",href: "/dashboard/mutual-investment" },
-  { label: "Loan",             href: "/dashboard/loan" },
-  { label: "Savings",          href: "/dashboard/savings" },
-  { label: "SPF Loan",         href: "/dashboard/spf-loan" },
-  { label: "Shares",           href: "/dashboard/shares" },
-  { label: "Housing Investment", href: "/dashboard/housing-investment" },
-  { label: "Password",         href: "/dashboard/password" },
+  { label: "Ledger",            href: "/dashboard/ledger" },
+  { label: "Mutual Investment", href: "/dashboard/mutual-investment" },
+  { label: "Loan",              href: "/dashboard/loan" },
+  { label: "Savings",           href: "/dashboard/savings" },
+  { label: "SPF Loan",          href: "/dashboard/spf-loan" },
+  { label: "Shares",            href: "/dashboard/shares" },
+  { label: "Housing Investment",href: "/dashboard/housing-investment" },
+  { label: "Password",          href: "/dashboard/password" },
 ];
 
 function DocIcon() {
@@ -33,29 +32,53 @@ function fmt(n: number) {
   return n.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-export default async function DashboardPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+export default function DashboardPage() {
+  const router = useRouter();
+  const [totalSavings, setTotalSavings] = useState(0);
+  const [totalLoans,   setTotalLoans]   = useState(0);
+  const [loading,      setLoading]      = useState(true);
 
-  let totalSavings = 0;
-  let totalLoans   = 0;
+  useEffect(() => {
+    async function load() {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.replace("/login"); return; }
 
-  try {
-    const { data: b } = await supabase
-      .from("balances")
-      .select("savings,spf_investment,mutual_investment,club50_investment,shirmawa,housing_investment,special_savings,share_capital,members_loan,spf_loan,product_loan")
-      .eq("member_id", user.id)
-      .single();
+      const { data: b } = await supabase
+        .from("balances")
+        .select("savings,spf_investment,mutual_investment,club50_investment,shirmawa,housing_investment,special_savings,share_capital,members_loan,spf_loan,product_loan")
+        .eq("member_id", user.id)
+        .single();
 
-    if (b) {
-      totalSavings = [b.savings, b.spf_investment, b.mutual_investment, b.club50_investment,
-                      b.shirmawa, b.housing_investment, b.special_savings, b.share_capital]
-                    .reduce((a, v) => a + Number(v ?? 0), 0);
-      totalLoans   = [b.members_loan, b.spf_loan, b.product_loan]
-                    .reduce((a, v) => a + Number(v ?? 0), 0);
+      if (b) {
+        setTotalSavings(
+          [b.savings, b.spf_investment, b.mutual_investment, b.club50_investment,
+           b.shirmawa, b.housing_investment, b.special_savings, b.share_capital]
+          .reduce((a, v) => a + Number(v ?? 0), 0)
+        );
+        setTotalLoans(
+          [b.members_loan, b.spf_loan, b.product_loan]
+          .reduce((a, v) => a + Number(v ?? 0), 0)
+        );
+      }
+      setLoading(false);
     }
-  } catch { /* table not yet created */ }
+    load();
+  }, [router]);
+
+  async function handleLogout() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.replace("/login");
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-12">
+        <div className="w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 space-y-4">
@@ -84,19 +107,17 @@ export default async function DashboardPage() {
           </Link>
         ))}
 
-        {/* Logout tile (server action via form) */}
-        <form action={logout} className="contents">
-          <button
-            type="submit"
-            className="bg-white rounded-lg py-4 px-2 flex flex-col items-center gap-1.5 shadow-sm hover:bg-red-50 active:scale-95 transition-all text-center w-full"
-          >
-            <svg className="w-9 h-9 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            <span className="text-xs font-medium text-red-600 leading-tight">Logout</span>
-          </button>
-        </form>
+        {/* Logout tile */}
+        <button
+          onClick={handleLogout}
+          className="bg-white rounded-lg py-4 px-2 flex flex-col items-center gap-1.5 shadow-sm hover:bg-red-50 active:scale-95 transition-all text-center w-full"
+        >
+          <svg className="w-9 h-9 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span className="text-xs font-medium text-red-600 leading-tight">Logout</span>
+        </button>
       </div>
     </div>
   );

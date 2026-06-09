@@ -1,49 +1,73 @@
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+"use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 const balanceRows = [
-  { label: "Members Savings",          key: "savings"           },
-  { label: "Share Capital",            key: "share_capital"     },
-  { label: "Special Savings",          key: "special_savings"   },
-  { label: "SPF Investment",           key: "spf_investment"    },
-  { label: "FH'95 Mutual Investment",  key: "mutual_investment" },
-  { label: "FH'95 Club 50 Investment", key: "club50_investment" },
-  { label: "Members Loan",             key: "members_loan"      },
-  { label: "SPF Loan",                 key: "spf_loan"          },
-  { label: "Product Loan",             key: "product_loan"      },
-] as const;
+  { label: "Members Savings",          key: "savings"            },
+  { label: "Share Capital",            key: "share_capital"      },
+  { label: "Special Savings",          key: "special_savings"    },
+  { label: "SPF Investment",           key: "spf_investment"     },
+  { label: "FH'95 Mutual Investment",  key: "mutual_investment"  },
+  { label: "FH'95 Club 50 Investment", key: "club50_investment"  },
+  { label: "Estate Investment",        key: "shirmawa"           },
+  { label: "Housing Investment",       key: "housing_investment" },
+  { label: "Members Loan",             key: "members_loan"       },
+  { label: "SPF Loan",                 key: "spf_loan"           },
+  { label: "Product Loan",             key: "product_loan"       },
+];
 
 function fmt(n: number) {
   return n.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-export default async function SummaryPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+export default function SummaryPage() {
+  const router = useRouter();
+  const [displayName,   setDisplayName]   = useState("Member");
+  const [accountNumber, setAccountNumber] = useState("");
+  const [balances,      setBalances]      = useState<Record<string, number>>({});
+  const [loading,       setLoading]       = useState(true);
 
-  let profile: { full_name: string; account_number: string } | null = null;
-  let balances: Record<string, number> = {};
+  useEffect(() => {
+    async function load() {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.replace("/login"); return; }
 
-  try {
-    const [{ data: p }, { data: b }] = await Promise.all([
-      supabase.from("profiles").select("full_name,account_number").eq("id", user.id).single(),
-      supabase.from("balances").select("*").eq("member_id", user.id).single(),
-    ]);
-    profile  = p;
-    if (b) balances = b as Record<string, number>;
-  } catch { /* table not yet created */ }
+      const [{ data: profile }, { data: b }] = await Promise.all([
+        supabase.from("profiles").select("full_name,account_number").eq("id", user.id).single(),
+        supabase.from("balances").select(
+          "savings,share_capital,special_savings,spf_investment,mutual_investment,club50_investment,shirmawa,housing_investment,members_loan,spf_loan,product_loan"
+        ).eq("member_id", user.id).single(),
+      ]);
 
-  const displayName   = profile?.full_name || user.user_metadata?.full_name || user.email?.split("@")[0] || "Member";
-  const accountNumber = profile?.account_number ?? `SCM${user.id.slice(0, 8).toUpperCase()}`;
+      if (profile) {
+        setDisplayName(profile.full_name || user.email?.split("@")[0] || "Member");
+        setAccountNumber(profile.account_number || `SCM${user.id.slice(0, 8).toUpperCase()}`);
+      } else {
+        setDisplayName(user.email?.split("@")[0] || "Member");
+        setAccountNumber(`SCM${user.id.slice(0, 8).toUpperCase()}`);
+      }
+
+      if (b) setBalances(b as Record<string, number>);
+      setLoading(false);
+    }
+    load();
+  }, [router]);
 
   const today = new Date().toLocaleDateString("en-GB", {
     day: "2-digit", month: "long", year: "numeric",
   });
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-12">
+        <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div>
