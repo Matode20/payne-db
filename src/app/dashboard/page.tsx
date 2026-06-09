@@ -1,22 +1,23 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { useEffect } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import { useMemberData } from '@/hooks/useMemberData';
 
 const menuItems = [
-  { label: "Summary",           href: "/dashboard/summary" },
-  { label: "SPF Investment",    href: "/dashboard/spf-investment" },
-  { label: "Estate Investment", href: "/dashboard/estate-investment" },
-  { label: "Ledger",            href: "/dashboard/ledger" },
-  { label: "Mutual Investment", href: "/dashboard/mutual-investment" },
-  { label: "Loan",              href: "/dashboard/loan" },
-  { label: "Savings",           href: "/dashboard/savings" },
-  { label: "SPF Loan",          href: "/dashboard/spf-loan" },
-  { label: "Shares",            href: "/dashboard/shares" },
-  { label: "Housing Investment",href: "/dashboard/housing-investment" },
-  { label: "Password",          href: "/dashboard/password" },
+  { label: 'Summary',           href: '/dashboard/summary' },
+  { label: 'SPF Investment',    href: '/dashboard/spf-investment' },
+  { label: 'Estate Investment', href: '/dashboard/estate-investment' },
+  { label: 'Ledger',            href: '/dashboard/ledger' },
+  { label: 'Mutual Investment', href: '/dashboard/mutual-investment' },
+  { label: 'Loan',              href: '/dashboard/loan' },
+  { label: 'Savings',           href: '/dashboard/savings' },
+  { label: 'SPF Loan',          href: '/dashboard/spf-loan' },
+  { label: 'Shares',            href: '/dashboard/shares' },
+  { label: 'Housing Investment',href: '/dashboard/housing-investment' },
+  { label: 'Password',          href: '/dashboard/password' },
 ];
 
 function DocIcon() {
@@ -29,47 +30,33 @@ function DocIcon() {
 }
 
 function fmt(n: number) {
-  return n.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return n.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [totalSavings, setTotalSavings] = useState(0);
-  const [totalLoans,   setTotalLoans]   = useState(0);
-  const [loading,      setLoading]      = useState(true);
+  const { userId, balances, loading } = useMemberData();
 
   useEffect(() => {
-    async function load() {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.replace("/login"); return; }
+    if (!loading && !userId) router.replace('/login');
+  }, [loading, userId, router]);
 
-      const { data: b } = await supabase
-        .from("balances")
-        .select("savings,spf_investment,mutual_investment,club50_investment,shirmawa,housing_investment,special_savings,share_capital,members_loan,spf_loan,product_loan")
-        .eq("member_id", user.id)
-        .single();
+  const totalSavings = balances
+    ? [balances.savings, balances.spf_investment, balances.mutual_investment,
+       balances.club50_investment, balances.shirmawa, balances.housing_investment,
+       balances.special_savings, balances.share_capital]
+      .reduce((a: number, v: unknown) => a + Number(v ?? 0), 0)
+    : 0;
 
-      if (b) {
-        setTotalSavings(
-          [b.savings, b.spf_investment, b.mutual_investment, b.club50_investment,
-           b.shirmawa, b.housing_investment, b.special_savings, b.share_capital]
-          .reduce((a, v) => a + Number(v ?? 0), 0)
-        );
-        setTotalLoans(
-          [b.members_loan, b.spf_loan, b.product_loan]
-          .reduce((a, v) => a + Number(v ?? 0), 0)
-        );
-      }
-      setLoading(false);
-    }
-    load();
-  }, [router]);
+  const totalLoans = balances
+    ? [balances.members_loan, balances.spf_loan, balances.product_loan]
+      .reduce((a: number, v: unknown) => a + Number(v ?? 0), 0)
+    : 0;
 
   async function handleLogout() {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.replace("/login");
+    router.replace('/login');
   }
 
   if (loading) {

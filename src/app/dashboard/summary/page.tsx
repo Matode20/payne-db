@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { useEffect } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useMemberData } from '@/hooks/useMemberData';
 
 const balanceRows = [
   { label: "Members Savings",          key: "savings"            },
@@ -20,45 +20,22 @@ const balanceRows = [
 ];
 
 function fmt(n: number) {
-  return n.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return n.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 export default function SummaryPage() {
   const router = useRouter();
-  const [displayName,   setDisplayName]   = useState("Member");
-  const [accountNumber, setAccountNumber] = useState("");
-  const [balances,      setBalances]      = useState<Record<string, number>>({});
-  const [loading,       setLoading]       = useState(true);
+  const { userId, profile, balances, loading } = useMemberData();
 
   useEffect(() => {
-    async function load() {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.replace("/login"); return; }
+    if (!loading && !userId) router.replace('/login');
+  }, [loading, userId, router]);
 
-      const [{ data: profile }, { data: b }] = await Promise.all([
-        supabase.from("profiles").select("full_name,account_number").eq("id", user.id).single(),
-        supabase.from("balances").select(
-          "savings,share_capital,special_savings,spf_investment,mutual_investment,club50_investment,shirmawa,housing_investment,members_loan,spf_loan,product_loan"
-        ).eq("member_id", user.id).single(),
-      ]);
+  const displayName   = profile?.full_name    || 'Member';
+  const accountNumber = profile?.account_number || '';
 
-      if (profile) {
-        setDisplayName(profile.full_name || user.email?.split("@")[0] || "Member");
-        setAccountNumber(profile.account_number || `SCM${user.id.slice(0, 8).toUpperCase()}`);
-      } else {
-        setDisplayName(user.email?.split("@")[0] || "Member");
-        setAccountNumber(`SCM${user.id.slice(0, 8).toUpperCase()}`);
-      }
-
-      if (b) setBalances(b as Record<string, number>);
-      setLoading(false);
-    }
-    load();
-  }, [router]);
-
-  const today = new Date().toLocaleDateString("en-GB", {
-    day: "2-digit", month: "long", year: "numeric",
+  const today = new Date().toLocaleDateString('en-GB', {
+    day: '2-digit', month: 'long', year: 'numeric',
   });
 
   if (loading) {
@@ -104,7 +81,7 @@ export default function SummaryPage() {
                 <tr key={row.key} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3 text-gray-700">{row.label}</td>
                   <td className="px-4 py-3 text-right font-mono text-gray-900 font-medium">
-                    {fmt(Number(balances[row.key] ?? 0))}
+                    {fmt(Number(balances?.[row.key] ?? 0))}
                   </td>
                 </tr>
               ))}

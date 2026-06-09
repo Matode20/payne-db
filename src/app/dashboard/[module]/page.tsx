@@ -1,65 +1,44 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { useEffect } from 'react';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import { useMemberData } from '@/hooks/useMemberData';
 
 const modules: Record<string, { label: string; balanceKey: string }> = {
-  "spf-investment":     { label: "SPF Investment",     balanceKey: "spf_investment"     },
-  "estate-investment":  { label: "Estate Investment",  balanceKey: "shirmawa"           },
-  "ledger":             { label: "Ledger",             balanceKey: "savings"            },
-  "mutual-investment":  { label: "Mutual Investment",  balanceKey: "mutual_investment"  },
-  "loan":               { label: "Loan",               balanceKey: "members_loan"       },
-  "savings":            { label: "Savings",            balanceKey: "savings"            },
-  "spf-loan":           { label: "SPF Loan",           balanceKey: "spf_loan"           },
-  "shares":             { label: "Shares",             balanceKey: "share_capital"      },
-  "housing-investment": { label: "Housing Investment", balanceKey: "housing_investment" },
+  'spf-investment':     { label: 'SPF Investment',     balanceKey: 'spf_investment'     },
+  'estate-investment':  { label: 'Estate Investment',  balanceKey: 'shirmawa'           },
+  'ledger':             { label: 'Ledger',             balanceKey: 'savings'            },
+  'mutual-investment':  { label: 'Mutual Investment',  balanceKey: 'mutual_investment'  },
+  'loan':               { label: 'Loan',               balanceKey: 'members_loan'       },
+  'savings':            { label: 'Savings',            balanceKey: 'savings'            },
+  'spf-loan':           { label: 'SPF Loan',           balanceKey: 'spf_loan'           },
+  'shares':             { label: 'Shares',             balanceKey: 'share_capital'      },
+  'housing-investment': { label: 'Housing Investment', balanceKey: 'housing_investment' },
 };
 
 function fmt(n: number) {
-  return n.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return n.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 export default function ModulePage() {
-  const params   = useParams();
-  const router   = useRouter();
-  const module   = params.module as string;
-  const config   = modules[module];
+  const params = useParams();
+  const router = useRouter();
+  const module = params.module as string;
+  const config = modules[module];
 
-  const [displayName,   setDisplayName]   = useState("Member");
-  const [accountNumber, setAccountNumber] = useState("");
-  const [balance,       setBalance]       = useState(0);
-  const [loading,       setLoading]       = useState(true);
+  const { userId, profile, balances, loading } = useMemberData();
 
   useEffect(() => {
-    if (!config) { router.replace("/dashboard"); return; }
+    if (!loading && !userId) router.replace('/login');
+    if (!config) router.replace('/dashboard');
+  }, [loading, userId, config, router]);
 
-    async function load() {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.replace("/login"); return; }
+  const balance       = balances ? Number(balances[config?.balanceKey ?? ''] ?? 0) : 0;
+  const displayName   = profile?.full_name     || 'Member';
+  const accountNumber = profile?.account_number || '';
 
-      const [{ data: profile }, { data: b }] = await Promise.all([
-        supabase.from("profiles").select("full_name,account_number").eq("id", user.id).single(),
-        supabase.from("balances").select(config.balanceKey).eq("member_id", user.id).single(),
-      ]);
-
-      if (profile) {
-        setDisplayName(profile.full_name || user.email?.split("@")[0] || "Member");
-        setAccountNumber(profile.account_number || `SCM${user.id.slice(0, 8).toUpperCase()}`);
-      } else {
-        setDisplayName(user.email?.split("@")[0] || "Member");
-        setAccountNumber(`SCM${user.id.slice(0, 8).toUpperCase()}`);
-      }
-
-      if (b) setBalance(Number((b as unknown as Record<string, unknown>)[config.balanceKey] ?? 0));
-      setLoading(false);
-    }
-    load();
-  }, [module, config, router]);
-
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toISOString().split('T')[0];
 
   if (!config) return null;
 
@@ -81,7 +60,7 @@ export default function ModulePage() {
       </div>
 
       <div className="p-4 max-w-lg mx-auto space-y-4">
-        {/* Current balance */}
+        {/* Current balance — updates in realtime */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 flex items-center justify-between">
           <span className="text-sm font-medium text-blue-800">Current Balance</span>
           <span className="text-lg font-bold font-mono text-blue-900">₦{fmt(balance)}</span>
