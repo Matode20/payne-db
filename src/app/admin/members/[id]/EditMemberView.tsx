@@ -4,8 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  updateMemberProfile,
-  updateMemberBalances,
   deleteMember,
   resetMemberPassword,
   setBanStatus,
@@ -82,24 +80,32 @@ export default function EditMemberView({ profile, balances, transactions }: Prop
   async function saveProfile() {
     setProfSaving(true); setProfMsg(null);
     try {
-      const result = await updateMemberProfile(profile.id, {
-        account_number: prof.account_number,
-        full_name:      prof.full_name,
-        phone:          prof.phone,
-        address:        prof.address,
-        role:           prof.role,
-        status:         prof.status,
+      const res = await fetch('/api/member/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          memberId: profile.id,
+          profileData: {
+            full_name:      prof.full_name,
+            account_number: prof.account_number,
+            phone:          prof.phone,
+            address:        prof.address,
+            role:           prof.role,
+            status:         prof.status,
+          },
+        }),
       });
-      console.log("[saveProfile] result:", result);
+      const result = await res.json();
+      console.log('[saveProfile] result:', result);
       if (result.error) {
         setProfMsg({ ok: false, text: result.error });
       } else {
-        setProfMsg({ ok: true, text: "Profile saved." });
+        setProfMsg({ ok: true, text: 'Profile saved.' });
         router.refresh();
       }
     } catch (e) {
-      console.error("[saveProfile] threw:", e);
-      setProfMsg({ ok: false, text: e instanceof Error ? e.message : "Save failed." });
+      console.error('[saveProfile] threw:', e);
+      setProfMsg({ ok: false, text: e instanceof Error ? e.message : 'Save failed.' });
     }
     setProfSaving(false);
   }
@@ -107,18 +113,38 @@ export default function EditMemberView({ profile, balances, transactions }: Prop
   async function saveBalances() {
     setBalSaving(true); setBalMsg(null);
     try {
-      const result = await updateMemberBalances(profile.id, bals, desc);
-      console.log("[saveBalances] result:", result);
+      const res = await fetch('/api/member/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          memberId: profile.id,
+          balanceData: {
+            savings:           bals.savings,
+            share_capital:     bals.share_capital,
+            special_savings:   bals.special_savings,
+            spf_investment:    bals.spf_investment,
+            mutual_investment: bals.mutual_investment,
+            club50_investment: bals.club50_investment,
+            shirmawa:          bals.shirmawa,
+            members_loan:      bals.members_loan,
+            spf_loan:          bals.spf_loan,
+            product_loan:      bals.product_loan,
+            lords_investment:  bals.lords_investment,
+          },
+        }),
+      });
+      const result = await res.json();
+      console.log('[saveBalances] result:', result);
       if (result.error) {
         setBalMsg({ ok: false, text: result.error });
       } else {
-        setBalMsg({ ok: true, text: "Balances saved and transaction logged." });
-        setDesc("");
+        setBalMsg({ ok: true, text: 'Balances saved.' });
+        setDesc('');
         router.refresh();
       }
     } catch (e) {
-      console.error("[saveBalances] threw:", e);
-      setBalMsg({ ok: false, text: e instanceof Error ? e.message : "Save failed." });
+      console.error('[saveBalances] threw:', e);
+      setBalMsg({ ok: false, text: e instanceof Error ? e.message : 'Save failed.' });
     }
     setBalSaving(false);
   }
