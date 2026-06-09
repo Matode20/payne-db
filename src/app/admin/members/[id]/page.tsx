@@ -29,7 +29,7 @@ export default async function EditMemberPage({
   let balances: BalancesData = {
     savings: 0, share_capital: 0, special_savings: 0, spf_investment: 0,
     mutual_investment: 0, club50_investment: 0, shirmawa: 0,
-    members_loan: 0, spf_loan: 0, product_loan: 0, lords_investment: 0,
+    members_loan: 0, spf_loan: 0, product_loan: 0, housing_investment: 0,
   };
 
   let transactions: {

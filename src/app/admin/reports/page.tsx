@@ -18,7 +18,7 @@ const balanceFields = [
   { key: "members_loan",      label: "Members Loan"             },
   { key: "spf_loan",          label: "SPF Loan"                 },
   { key: "product_loan",      label: "Product Loan"             },
-  { key: "lords_investment",  label: "Lords Investment"         },
+  { key: "housing_investment", label: "Housing Investment"       },
 ] as const;
 
 export default async function ReportsPage() {
@@ -68,7 +68,7 @@ export default async function ReportsPage() {
             <tr>
               <td className="px-5 py-3 font-bold text-gray-900">Grand Total (Savings)</td>
               <td className="px-5 py-3 text-right font-mono font-bold text-green-700">
-                {fmt(["savings","share_capital","special_savings","spf_investment","mutual_investment","club50_investment","shirmawa","lords_investment"].reduce((a, k) => a + (totals[k] ?? 0), 0))}
+                {fmt(["savings","share_capital","special_savings","spf_investment","mutual_investment","club50_investment","shirmawa","housing_investment"].reduce((a, k) => a + (totals[k] ?? 0), 0))}
               </td>
             </tr>
             <tr>

@@ -23,7 +23,7 @@ const memberLinks = [
   { label: "Savings",          href: "/dashboard/savings" },
   { label: "SPF Loan",         href: "/dashboard/spf-loan" },
   { label: "Shares",           href: "/dashboard/shares" },
-  { label: "Lords Investment", href: "/dashboard/lords-investment" },
+  { label: "Housing Investment", href: "/dashboard/housing-investment" },
   { label: "Password",         href: "/dashboard/password" },
 ];
 

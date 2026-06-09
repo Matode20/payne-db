@@ -106,7 +106,7 @@ export interface BalancesData {
   members_loan: number;
   spf_loan: number;
   product_loan: number;
-  lords_investment: number;
+  housing_investment: number;
 }
 
 export async function updateMemberBalances(
@@ -140,7 +140,7 @@ export async function updateMemberBalances(
         members_loan:     newBalances.members_loan,
         spf_loan:         newBalances.spf_loan,
         product_loan:     newBalances.product_loan,
-        lords_investment: newBalances.lords_investment,
+        housing_investment: newBalances.housing_investment,
         updated_at:       new Date().toISOString(),
       },
       { onConflict: "member_id" }

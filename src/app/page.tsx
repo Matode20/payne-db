@@ -4,11 +4,10 @@ import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { resolveLoginEmail } from "@/app/actions";
 
 export default function LandingPage() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
+  const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
   const [error, setError]       = useState<string | null>(null);
   const [loading, setLoading]   = useState(false);
@@ -18,17 +17,9 @@ export default function LandingPage() {
     setError(null);
     setLoading(true);
 
-    // Resolve account number → email (no-op if already an email)
-    const resolved = await resolveLoginEmail(username);
-    if (resolved.error || !resolved.email) {
-      setError(resolved.error ?? "Login failed.");
-      setLoading(false);
-      return;
-    }
-
     const supabase = createClient();
     const { error: authError } = await supabase.auth.signInWithPassword({
-      email: resolved.email,
+      email,
       password,
     });
 
@@ -82,15 +73,15 @@ export default function LandingPage() {
 
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
-                Username
+                Email Address
               </label>
               <input
-                type="text"
+                type="email"
                 required
-                autoComplete="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="enter account number"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
             </div>

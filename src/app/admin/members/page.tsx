@@ -24,11 +24,11 @@ export default async function MembersPage({
     email: string;
     role: string;
     status: string;
-    balances: { savings: number; spf_investment: number; mutual_investment: number; club50_investment: number; shirmawa: number; lords_investment: number; special_savings: number; share_capital: number; members_loan: number; spf_loan: number; product_loan: number } | null;
+    balances: { savings: number; spf_investment: number; mutual_investment: number; club50_investment: number; shirmawa: number; housing_investment: number; special_savings: number; share_capital: number; members_loan: number; spf_loan: number; product_loan: number } | null;
   }[] = [];
 
   try {
-    let query = admin.from("profiles").select("id,account_number,full_name,email,role,status,balances(savings,spf_investment,mutual_investment,club50_investment,shirmawa,lords_investment,special_savings,share_capital,members_loan,spf_loan,product_loan)").order("created_at", { ascending: false });
+    let query = admin.from("profiles").select("id,account_number,full_name,email,role,status,balances(savings,spf_investment,mutual_investment,club50_investment,shirmawa,housing_investment,special_savings,share_capital,members_loan,spf_loan,product_loan)").order("created_at", { ascending: false });
     if (q) {
       query = query.or(`full_name.ilike.%${q}%,account_number.ilike.%${q}%,email.ilike.%${q}%`);
     }
@@ -88,7 +88,7 @@ export default async function MembersPage({
               <tbody className="divide-y divide-gray-100">
                 {members.map((m) => {
                   const b = (m.balances as typeof members[0]["balances"]) ?? null;
-                  const savings = b ? [b.savings, b.spf_investment, b.mutual_investment, b.club50_investment, b.shirmawa, b.lords_investment, b.special_savings, b.share_capital].reduce((a, v) => a + Number(v ?? 0), 0) : 0;
+                  const savings = b ? [b.savings, b.spf_investment, b.mutual_investment, b.club50_investment, b.shirmawa, b.housing_investment, b.special_savings, b.share_capital].reduce((a, v) => a + Number(v ?? 0), 0) : 0;
                   const loans   = b ? [b.members_loan, b.spf_loan, b.product_loan].reduce((a, v) => a + Number(v ?? 0), 0) : 0;
 
                   return (

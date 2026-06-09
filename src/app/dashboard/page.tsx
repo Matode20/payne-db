@@ -16,7 +16,7 @@ const menuItems = [
   { label: "Savings",          href: "/dashboard/savings" },
   { label: "SPF Loan",         href: "/dashboard/spf-loan" },
   { label: "Shares",           href: "/dashboard/shares" },
-  { label: "Lords Investment", href: "/dashboard/lords-investment" },
+  { label: "Housing Investment", href: "/dashboard/housing-investment" },
   { label: "Password",         href: "/dashboard/password" },
 ];
 
@@ -44,13 +44,13 @@ export default async function DashboardPage() {
   try {
     const { data: b } = await supabase
       .from("balances")
-      .select("savings,spf_investment,mutual_investment,club50_investment,shirmawa,lords_investment,special_savings,share_capital,members_loan,spf_loan,product_loan")
+      .select("savings,spf_investment,mutual_investment,club50_investment,shirmawa,housing_investment,special_savings,share_capital,members_loan,spf_loan,product_loan")
       .eq("member_id", user.id)
       .single();
 
     if (b) {
       totalSavings = [b.savings, b.spf_investment, b.mutual_investment, b.club50_investment,
-                      b.shirmawa, b.lords_investment, b.special_savings, b.share_capital]
+                      b.shirmawa, b.housing_investment, b.special_savings, b.share_capital]
                     .reduce((a, v) => a + Number(v ?? 0), 0);
       totalLoans   = [b.members_loan, b.spf_loan, b.product_loan]
                     .reduce((a, v) => a + Number(v ?? 0), 0);

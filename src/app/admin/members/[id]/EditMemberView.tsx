@@ -52,7 +52,7 @@ const balanceFields: { key: keyof BalancesData; label: string }[] = [
   { key: "members_loan",      label: "Members Loan"               },
   { key: "spf_loan",          label: "SPF Loan"                   },
   { key: "product_loan",      label: "Product Loan"               },
-  { key: "lords_investment",  label: "Lords Investment"           },
+  { key: "housing_investment", label: "Housing Investment"         },
 ];
 
 function fmt(n: number) {
@@ -130,7 +130,7 @@ export default function EditMemberView({ profile, balances, transactions }: Prop
             members_loan:      bals.members_loan,
             spf_loan:          bals.spf_loan,
             product_loan:      bals.product_loan,
-            lords_investment:  bals.lords_investment,
+            housing_investment: bals.housing_investment,
           },
         }),
       });

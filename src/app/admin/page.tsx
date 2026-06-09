@@ -18,7 +18,7 @@ async function getStats() {
     admin.from("profiles").select("*", { count: "exact", head: true }),
     admin.from("profiles").select("*", { count: "exact", head: true }).eq("status", "active"),
     admin.from("balances").select(
-      "savings,spf_investment,mutual_investment,club50_investment,shirmawa,lords_investment,special_savings,share_capital,members_loan,spf_loan,product_loan"
+      "savings,spf_investment,mutual_investment,club50_investment,shirmawa,housing_investment,special_savings,share_capital,members_loan,spf_loan,product_loan"
     ),
   ]);
 
@@ -29,7 +29,7 @@ async function getStats() {
   let totalLoans   = 0;
   for (const b of (balanceRows ?? [])) {
     totalSavings += [b.savings, b.spf_investment, b.mutual_investment, b.club50_investment,
-                     b.shirmawa, b.lords_investment, b.special_savings, b.share_capital]
+                     b.shirmawa, b.housing_investment, b.special_savings, b.share_capital]
                     .reduce((a, v) => a + Number(v ?? 0), 0);
     totalLoans   += [b.members_loan, b.spf_loan, b.product_loan]
                     .reduce((a, v) => a + Number(v ?? 0), 0);
