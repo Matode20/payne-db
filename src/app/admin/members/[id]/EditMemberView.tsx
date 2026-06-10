@@ -100,8 +100,9 @@ export default function EditMemberView({ profile, balances, transactions }: Prop
       if (result.error) {
         setProfMsg({ ok: false, text: result.error });
       } else {
-        const confirmed = result.saved?.full_name ?? '(unconfirmed)';
-        setProfMsg({ ok: true, text: `Profile saved. DB confirms name: "${confirmed}"` });
+        const confirmedName = result.saved?.full_name ?? '(unconfirmed)';
+        const confirmedRole = result.saved?.role     ?? '(unconfirmed)';
+        setProfMsg({ ok: true, text: `Saved. DB confirms → name: "${confirmedName}", role: "${confirmedRole}"` });
         router.refresh();
       }
     } catch (e) {

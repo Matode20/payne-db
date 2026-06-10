@@ -3,9 +3,11 @@ export const revalidate = 0;
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import PortalShell from "@/components/PortalShell";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  // Verify auth via session client
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
@@ -15,7 +17,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
   let role        = (user.user_metadata?.role as string) ?? "member";
 
   try {
-    const { data: profile } = await supabase
+    // Use admin client so we always read the latest role — same connection
+    // path as the admin write, bypasses RLS and any anon-key caching.
+    const admin = createAdminClient();
+    const { data: profile } = await admin
       .from("profiles")
       .select("full_name, account_number, role")
       .eq("id", user.id)
