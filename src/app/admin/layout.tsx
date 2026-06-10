@@ -1,5 +1,9 @@
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import PortalShell from "@/components/PortalShell";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -12,7 +16,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   let role        = (user.user_metadata?.role as string) ?? "member";
 
   try {
-    const { data: profile } = await supabase
+    // Use admin client so role is always read fresh — same connection as the write path.
+    const admin = createAdminClient();
+    const { data: profile } = await admin
       .from("profiles")
       .select("full_name, account_number, role")
       .eq("id", user.id)
