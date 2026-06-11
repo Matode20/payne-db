@@ -38,6 +38,11 @@ export default function SummaryPage() {
     day: '2-digit', month: 'long', year: 'numeric',
   });
 
+  const savingsKeys = ['savings','share_capital','special_savings','spf_investment','mutual_investment','club50_investment','shirmawa','housing_investment'];
+  const loanKeys    = ['members_loan','spf_loan','product_loan'];
+  const totalSavings = savingsKeys.reduce((s, k) => s + Number(balances?.[k] ?? 0), 0);
+  const totalLoans   = loanKeys.reduce((s, k)    => s + Number(balances?.[k] ?? 0), 0);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center p-12">
@@ -87,6 +92,18 @@ export default function SummaryPage() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Totals */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-green-600 text-white rounded-lg p-3 text-center shadow-sm">
+            <p className="text-xs font-medium opacity-80">Total Savings &amp; Investments</p>
+            <p className="text-lg font-bold font-mono mt-1">₦{fmt(totalSavings)}</p>
+          </div>
+          <div className="bg-orange-500 text-white rounded-lg p-3 text-center shadow-sm">
+            <p className="text-xs font-medium opacity-80">Total Loans</p>
+            <p className="text-lg font-bold font-mono mt-1">₦{fmt(totalLoans)}</p>
+          </div>
         </div>
 
         <Link href="/dashboard"

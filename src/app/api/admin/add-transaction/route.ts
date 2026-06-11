@@ -55,13 +55,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: txErr.message }, { status: 500 });
   }
 
+  // Recalculate from transactions using the DB function — most accurate value
+  const { data: rpcData, error: rpcErr } = await admin.rpc('get_member_balance', {
+    p_member_id: memberId,
+    p_category:  category,
+  });
+  if (rpcErr) console.error('[add-transaction] get_member_balance error:', rpcErr);
+  const newBalance = rpcErr ? balanceAfter : Number(rpcData ?? balanceAfter);
+
   // Update balances table to keep it in sync
   const { error: balErr } = await admin
     .from('balances')
-    .update({ [category]: balanceAfter, updated_at: new Date().toISOString() })
+    .update({ [category]: newBalance, updated_at: new Date().toISOString() })
     .eq('member_id', memberId);
 
   if (balErr) console.error('[add-transaction] balance sync error:', balErr);
 
-  return NextResponse.json({ success: true, newBalance: balanceAfter, balanceBefore, balanceAfter });
+  console.log(`[add-transaction] confirmed new balance from DB: ₦${newBalance}`);
+
+  return NextResponse.json({ success: true, newBalance, balanceBefore, balanceAfter: newBalance });
 }
