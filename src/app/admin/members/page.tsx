@@ -4,6 +4,7 @@ export const revalidate = 0;
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 import MemberActions from "./MemberActions";
+import AddMemberModal from "./AddMemberModal";
 
 function fmt(n: number) {
   return n.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -40,10 +41,7 @@ export default async function MembersPage({
     <div className="p-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <h1 className="text-xl font-bold text-gray-900">Members</h1>
-        <Link href="/admin/members/new"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 transition-colors">
-          + Add New Member
-        </Link>
+        <AddMemberModal />
       </div>
 
       {/* Search */}
