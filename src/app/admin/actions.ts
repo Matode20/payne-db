@@ -6,20 +6,18 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 async function requireAdmin() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Unauthorized");
+  const { data: { user }, error } = await supabase.auth.getUser();
+  if (error || !user) throw new Error("Unauthorized");
 
-  try {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-    if (profile?.role === "admin") return user;
-  } catch {}
+  const adminSupabase = createAdminClient();
+  const { data: profile } = await adminSupabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
 
-  if ((user.user_metadata?.role as string) === "admin") return user;
-  throw new Error("Forbidden");
+  if (!profile || profile.role !== "admin") throw new Error("Forbidden");
+  return user;
 }
 
 // ── Member CRUD ────────────────────────────────────────────
