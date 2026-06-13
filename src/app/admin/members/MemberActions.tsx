@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { deleteMember, resetMember, setBanStatus } from "../actions";
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function MemberActions({ id, name, status }: Props) {
+  const router = useRouter();
   const isBanned = status === "banned";
 
   async function handleDelete() {
@@ -23,7 +25,12 @@ export default function MemberActions({ id, name, status }: Props) {
 
   async function handleReset() {
     if (!confirm(`Are you sure you want to reset all balances and transactions for ${name}? This cannot be undone.`)) return;
-    await resetMember(id);
+    const result = await resetMember(id);
+    if (result.error) {
+      alert(`Reset failed: ${result.error}`);
+      return;
+    }
+    router.refresh();
   }
 
   return (
