@@ -185,6 +185,41 @@ export async function deleteMember(memberId: string) {
   return { success: true };
 }
 
+export async function resetMember(memberId: string) {
+  await requireAdmin();
+  const admin = createAdminClient();
+
+  const { error: txError } = await admin
+    .from("transactions")
+    .delete()
+    .eq("member_id", memberId);
+  if (txError) return { error: txError.message };
+
+  const { error: balError } = await admin
+    .from("balances")
+    .update({
+      savings: 0,
+      share_capital: 0,
+      special_savings: 0,
+      spf_investment: 0,
+      mutual_investment: 0,
+      club50_investment: 0,
+      shirmawa: 0,
+      members_loan: 0,
+      spf_loan: 0,
+      product_loan: 0,
+      housing_investment: 0,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("member_id", memberId);
+  if (balError) return { error: balError.message };
+
+  revalidatePath(`/admin/members/${memberId}`);
+  revalidatePath("/admin/members");
+  revalidatePath("/admin");
+  return { success: true };
+}
+
 export async function resetMemberPassword(email: string) {
   await requireAdmin();
   const admin = createAdminClient();
